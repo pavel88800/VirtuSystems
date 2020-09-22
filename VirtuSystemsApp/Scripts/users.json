@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "users": [
+    {
+      "userID": 1,
+      "name": "Вася",
+      "surname": "Иванов",
+      "date": "10/08/1991",
+      "email": "vasiv@mail.ru",
+      "married": false
+    },
+    {
+      "userID": 2,
+      "name": "Петя",
+      "surname": "Федоров",
+      "date": "03/08/1993",
+      "email": "petfed@yandex.ru",
+      "married": true
+    },
+    {
+      "userID": 3,
+      "name": "Вова",
+      "surname": "Кузнецов",
+      "date": "11/07/1989",
+      "email": "vok@mail.ru",
+      "married": false
+    },
+    {
+      "userID": 4,
+      "name": "Саша",
+      "surname": "Сидоров",
+      "date": "05/08/1991",
+      "email": "vvvs@mail.ru",
+      "married": true
+    }
+  ]
+}
