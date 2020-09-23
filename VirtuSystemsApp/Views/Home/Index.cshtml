@@ -1,34 +1,28 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-<script>
+    <script>
 
 
     Ext.define('User',
         {
             extend: 'Ext.data.Model',
 
-            idProperty: 'userID',
+            idProperty: 'Id',
 
             fields: [
                 {
-                    name: 'userID',
+                    name: 'Id',
                     type: 'int'
                 }, {
-                    name: 'name',
+                    name: 'Name',
                     type: 'string'
                 }, {
-                    name: 'surname',
-                    type: 'string'
-                }, {
-                    name: 'date',
+                    name: 'BirthDay',
                     type: 'date'
                 }, {
-                    name: 'email',
+                    name: 'Phone',
                     type: 'string'
-                }, {
-                    name: 'married',
-                    type: 'bool'
                 }
             ]
         });
@@ -36,11 +30,12 @@
     var store = Ext.create('Ext.data.Store',
         {
             model: 'User',
+            storeId: 'usersStore',
             autoLoad: true,
             proxy: {
                 type: 'ajax',
                 url: '@Url.Action("App")',
-                
+
                 reader: {
                     type: 'json',
                     root: 'users'
@@ -53,21 +48,53 @@
             title: 'Пользователи',
             layout: 'fit',
             store: store,
-            plugins:[{
-                ptype:'cellediting',
-                clicksToEdit: 1
-            }],
+            plugins: [
+                {
+                    ptype: 'cellediting',
+                    clicksToEdit: 1
+                }
+            ],
+            tbar: [
+                {
+                    text: 'Добавление новой строки',
+                    handler: function() {
+                        store.add({
+                            Name: '',
+                            BirthDay: '',
+                            Phone: 0
+                        });
+                    }
+                },
+                {
+                    text: "Сохранить",
+                    handler: function () {
+                        var store = Ext.getStore('usersStore');
+                        
+                        var data = GetData(store);
+                        var json = Ext.encode(data);
+                        
+                        Ext.Ajax.request({
+                            method: 'POST',
+                            url: '@Url.Action("Edit")',
+                            params: {json},
+                            success: function(response){
+                                alert(response.responseText);
+                            }
+                        });
+                    }
+                },
+            ],
             columns: [
                 {
                     header: 'ФИО',
-                    dataIndex: 'name',
+                    dataIndex: 'Name',
                     editor: {
                         xtype: 'textfield',
                         allowBlank: false
                     }
                 }, {
                     header: 'Дата рождения',
-                    dataIndex: 'date',
+                    dataIndex: 'BirthDay',
                     xtype: 'datecolumn',
                     format: 'd/m/Y',
                     flex: 1,
@@ -76,8 +103,8 @@
                         allowBlank: false
                     }
                 }, {
-                    header: 'Email',
-                    dataIndex: 'email',
+                    header: 'Телефон',
+                    dataIndex: 'Phone',
                     flex: 1,
                     editor: {
                         xtype: 'textfield',
@@ -89,4 +116,25 @@
         });
 
 
-</script>
+    function GetData(store) {
+        var updateGrid = store.getUpdatedRecords();
+        var newRowGrid = store.getNewRecords();
+        var removeRowGrid = store.getRemovedRecords();
+
+        var data = [];
+
+        for (var i = 0; i < updateGrid.length; i++) {
+            data.push(updateGrid[i].data);
+        }
+
+        for (var i = 0; i < newRowGrid.length; i++) {
+            data.push(newRowGrid[i].data);
+        }
+
+        for (var i = 0; i < removeRowGrid.length; i++) {
+            data.push(removeRowGrid[i].data);
+        }
+
+        return data;
+    }
+    </script>

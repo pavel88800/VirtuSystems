@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtuSystemsApp", "VirtuSystemsApp\VirtuSystemsApp.csproj", "{D23AF176-073C-47B8-9685-1B74E4484485}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtuSystemsApp.DB", "VirtuSystemsApp.DB\VirtuSystemsApp.DB.csproj", "{080316F6-72EF-4350-AF06-7046DE9A92D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtuSystemsApp.BL", "VirtuSystemsApp.BL\VirtuSystemsApp.BL.csproj", "{DA62EA81-EBF0-4E19-B412-733B8691232F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{D23AF176-073C-47B8-9685-1B74E4484485}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D23AF176-073C-47B8-9685-1B74E4484485}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D23AF176-073C-47B8-9685-1B74E4484485}.Release|Any CPU.Build.0 = Release|Any CPU
+		{080316F6-72EF-4350-AF06-7046DE9A92D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{080316F6-72EF-4350-AF06-7046DE9A92D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{080316F6-72EF-4350-AF06-7046DE9A92D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{080316F6-72EF-4350-AF06-7046DE9A92D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA62EA81-EBF0-4E19-B412-733B8691232F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA62EA81-EBF0-4E19-B412-733B8691232F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA62EA81-EBF0-4E19-B412-733B8691232F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA62EA81-EBF0-4E19-B412-733B8691232F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
