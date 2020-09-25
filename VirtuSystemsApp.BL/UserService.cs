@@ -11,20 +11,31 @@ namespace VirtuSystemsApp.BL
 {
     public class UserService
     {
-        public async Task AddDataInDBAsync()
+        /// <summary>
+        ///     Инициализация данных в БД.
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddDataInDbAsync()
         {
-            var users = new List<User>();
-            for (var i = 1; i <= 100; i++)
-                users.Add(new User {BirthDay = DateTime.Today.Date, Name = "Test_" + i, Phone = "8 888 888 88 88"});
-
-            using (var _context = new VirtuSystemsDbContex())
+            await Task.Run(() =>
             {
-                await _context.AddRangeAsync(users);
-                await _context.SaveChangesAsync();
-            }
+                using (var context = new VirtuSystemsDbContex())
+                {
+                    var items = context.Users.Count();
+                    if (items == 0)
+                    {
+                        var users = new List<User>();
+                        for (var i = 1; i <= 10; i++)
+                            users.Add(new User
+                                {BirthDay = DateTime.Today.Date, Name = "Test_" + i, Phone = "8 888 888 88 88"});
+
+                        context.AddRange(users);
+                        context.SaveChanges();
+                    }
+                }
+            });
         }
-
-
+        
         /// <summary>
         ///     Получить всех пользователей.
         /// </summary>
@@ -39,8 +50,7 @@ namespace VirtuSystemsApp.BL
                     users = await context.Users.ToListAsync();
                 }
 
-                var json = JsonConvert.SerializeObject(users);
-                return json;
+                return JsonConvert.SerializeObject(users);
             }
             catch
             {
@@ -55,58 +65,71 @@ namespace VirtuSystemsApp.BL
         /// <returns></returns>
         public async Task<bool> EditUsersAsync(string users)
         {
-            await Task.Run(() =>
+            try
             {
-                List<User> usersList;
-
-                usersList = JsonConvert.DeserializeObject<List<User>>(users);
-
-                using (var context = new VirtuSystemsDbContex())
+                await Task.Run(() =>
                 {
-                    var usersDb = context.Users.Where(x => usersList.Contains(x)).ToList();
+                    List<User> usersList;
+                    usersList = JsonConvert.DeserializeObject<List<User>>(users);
 
-                    if (usersDb.Count == 0)
-                        foreach (var userslist in usersList)
-                            usersDb.Add(new User
-                            {
-                                Name = userslist.Name,
-                                Phone = userslist.Phone,
-                                BirthDay = userslist.BirthDay
-                            });
-                    else
-                        foreach (var userdb in usersDb)
-                        foreach (var userslist in usersList)
-                            if (userdb.Id == userslist.Id)
-                            {
-                                userdb.BirthDay = userslist.BirthDay;
-                                userdb.Name = userslist.Name;
-                                userdb.Phone = userslist.Phone;
-                            }
-                            else
-                            {
-                                usersDb.Add(new User
-                                {
-                                    Name = userslist.Name,
-                                    Phone = userslist.Phone,
-                                    BirthDay = userslist.BirthDay
-                                });
-                            }
+                    using (var context = new VirtuSystemsDbContex())
+                    {
+                        var usersDb = context.Users.Where(x => usersList.Contains(x)).AsTracking().ToList();
+                        usersDb = GetUpdateUserList(usersDb, usersList);
 
-                    context.UpdateRange(usersDb);
-                    context.SaveChanges();
-                }
-            });
-            return default;
+                        foreach (var user in usersList)
+                            if (usersDb.Exists(x => x.Id != user.Id))
+                                usersDb.Add(GetNewUser(user));
+
+                        context.UpdateRange(usersDb.Distinct());
+                        context.SaveChanges();
+                    }
+                });
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
-        ///     Удалить пользователей
+        ///     Получить нового юзера
         /// </summary>
-        /// <param name="ids">Список идентификаторов пользователей.</param>
+        /// <param name="user">юзер</param>
         /// <returns></returns>
-        public bool DeleteUsers(List<int> ids)
+        private User GetNewUser(User user)
         {
-            return default;
+            return new User
+            {
+                Name = user.Name,
+                Phone = user.Phone,
+                BirthDay = user.BirthDay
+            };
+        }
+
+        /// <summary>
+        ///     Получить обновленного пользователя.
+        /// </summary>
+        /// <param name="usersDb">юзер из БД</param>
+        /// <param name="usersList">юзер измененный</param>
+        /// <returns></returns>
+        private List<User> GetUpdateUserList(List<User> usersDb, List<User> usersList)
+        {
+            if (usersDb.Count == 0)
+                foreach (var user in usersList)
+                    usersDb.Add(GetNewUser(user));
+            else
+                foreach (var userdb in usersDb)
+                foreach (var user in usersList)
+                    if (userdb.Id == user.Id)
+                    {
+                        userdb.BirthDay = user.BirthDay;
+                        userdb.Name = user.Name;
+                        userdb.Phone = user.Phone;
+                    }
+
+            return usersDb;
         }
     }
 }

@@ -1,53 +1,16 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-    <script>
+<script>
 
-
-    Ext.define('User',
-        {
-            extend: 'Ext.data.Model',
-
-            idProperty: 'Id',
-
-            fields: [
-                {
-                    name: 'Id',
-                    type: 'int'
-                }, {
-                    name: 'Name',
-                    type: 'string'
-                }, {
-                    name: 'BirthDay',
-                    type: 'date'
-                }, {
-                    name: 'Phone',
-                    type: 'string'
-                }
-            ]
-        });
-
-    var store = Ext.create('Ext.data.Store',
-        {
-            model: 'User',
-            storeId: 'usersStore',
-            autoLoad: true,
-            proxy: {
-                type: 'ajax',
-                url: '@Url.Action("App")',
-
-                reader: {
-                    type: 'json',
-                    root: 'users'
-                }
-            }
-        });
+    InitModel();
+    var store = InitStore();
 
     Ext.create('Ext.grid.Panel',
         {
             title: 'Пользователи',
             layout: 'fit',
-            store: store,
+            store: Ext.getStore('usersStore'),
             plugins: [
                 {
                     ptype: 'cellediting',
@@ -58,27 +21,29 @@
                 {
                     text: 'Добавление новой строки',
                     handler: function() {
-                        store.add({
-                            Name: '',
-                            BirthDay: '',
-                            Phone: 0
-                        });
+                        store.insert(0,
+                            {
+                                Name: '',
+                                BirthDay: '',
+                                Phone: 0
+                            });
+                        this.getSelectionModel().selectRow(0);
                     }
                 },
                 {
                     text: "Сохранить",
-                    handler: function () {
+                    handler: function() {
                         var store = Ext.getStore('usersStore');
-                        
                         var data = GetData(store);
                         var json = Ext.encode(data);
-                        
+
                         Ext.Ajax.request({
                             method: 'POST',
-                            url: '@Url.Action("Edit")',
-                            params: {json},
-                            success: function(response){
-                                alert(response.responseText);
+                            url: '@Url.Action("AddOrEdit")',
+                            params: { json },
+                            success: function(response) {
+                                store.load();
+                                alert("Данные успешно обновлены");
                             }
                         });
                     }
@@ -115,11 +80,12 @@
             renderTo: Ext.getBody()
         });
 
-
+    /**
+     * Получить данные и хранилища     
+     */
     function GetData(store) {
         var updateGrid = store.getUpdatedRecords();
         var newRowGrid = store.getNewRecords();
-        var removeRowGrid = store.getRemovedRecords();
 
         var data = [];
 
@@ -131,10 +97,54 @@
             data.push(newRowGrid[i].data);
         }
 
-        for (var i = 0; i < removeRowGrid.length; i++) {
-            data.push(removeRowGrid[i].data);
-        }
-
         return data;
     }
-    </script>
+
+    /**
+     * Инициализация модели
+     */
+    function InitModel() {
+        Ext.define('Scripts.User.Models.User',
+            {
+                extend: 'Ext.data.Model',
+                idProperty: 'Id',
+                fields: [
+                    {
+                        name: 'Id',
+                        type: 'int'
+                    }, {
+                        name: 'Name',
+                        type: 'string'
+                    }, {
+                        name: 'BirthDay',
+                        type: 'date'
+                    }, {
+                        name: 'Phone',
+                        type: 'string'
+                    }
+                ]
+            });
+    }
+
+    /**
+     * Инициализация Хранилища
+     */
+    function InitStore() {
+        return Ext.create('Ext.data.Store',
+            {
+                model: 'Scripts.User.Models.User',
+                storeId: 'usersStore',
+                autoLoad: true,
+                proxy: {
+                    type: 'ajax',
+                    url: '@Url.Action("GetUsers")',
+
+                    reader: {
+                        type: 'json',
+                        root: 'users'
+                    }
+                }
+            });
+    }
+
+</script>

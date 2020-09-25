@@ -1,56 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Threading.Tasks;
 using System.Web.Mvc;
 using VirtuSystemsApp.BL;
 
 namespace VirtuSystemsApp.Controllers
 {
-    
     public class HomeController : Controller
     {
-        private UserService _userService = new UserService();
+        private readonly UserService _userService = new UserService();
 
+        /// <summary>
+        ///     Инициализируем страницу.
+        /// </summary>
+        /// <returns></returns>
         public async Task<ActionResult> Index()
         {
-            //await _userService.AddDataInDBAsync();
-
+            await _userService.AddDataInDbAsync();
             return View();
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-
+        /// <summary>
+        ///     Получить пользователей (без пагинации)
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Route("A")]
-        public async Task<string> App()
+        [Route("Get")]
+        public async Task<string> GetUsers()
         {
-
-            var res = await _userService.GetUsersAsync();
-            return res;
+            return await _userService.GetUsersAsync();
         }
 
+        /// <summary>
+        ///     Редактирование пользователей
+        /// </summary>
+        /// <param name="json">Json</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Edit")]
-        public async Task<bool> Edit(string json)
+        public async Task<bool> AddOrEdit(string json)
         {
-            var res = await _userService.EditUsersAsync(json);
-
-            return default;
+            return await _userService.EditUsersAsync(json);
         }
-
     }
 }
