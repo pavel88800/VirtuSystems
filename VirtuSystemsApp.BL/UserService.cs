@@ -78,7 +78,7 @@ namespace VirtuSystemsApp.BL
                         usersDb = GetUpdateUserList(usersDb, usersList);
 
                         foreach (var user in usersList)
-                            if (usersDb.Exists(x => x.Id != user.Id))
+                            if (usersDb.All(x => x.Id != user.Id))
                                 usersDb.Add(GetNewUser(user));
 
                         context.UpdateRange(usersDb.Distinct());
